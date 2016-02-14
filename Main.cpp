@@ -41,6 +41,7 @@ int main (int argc, char* argv[]) {
 	DataFile TextBuddy ;
 	TextBuddy.setEnvironment(argc,argv);
 	TextBuddy.displayWelcomePage();
+	TextBuddy.executeCommandUntilExit();
 	return 0;
 }
 

@@ -8,6 +8,7 @@ const std::string MESSAGE_EMPTY_CONTENTS = "%s is empty";
 const std::string MESSAGE_DISPLAY_CONTENTS = "%d. %s";
 const std::string MESSAGE_COMMAND_PROMPT = "command: ";
 const std::string MESSAGE_TEXT_NAME_PROMPT = "Please input the text file: ";
+const std::string MESSAGE_INVALID_COMMAND = "Invalid command inputted";
 
 void DataFile::setEnvironment(int argc, char* argv[]) {
 	if(checkForArguments(argc, argv) == false) { //MISSING ONE .TXT CHECKER
@@ -72,72 +73,133 @@ void DataFile::displayWelcomePage() {
 /************************************************************************/
 
 //remove extra spaces before the inital word in the string
-void cleanDescriptionString(std::string &descriptionString) {
+void DataFile::cleanInputString(std::string &descriptionString) {
 	while (descriptionString[0] == ' ') {
 		descriptionString.erase(descriptionString.begin()); 
 	}
 }
 
-void DataFile::welcomePage() {
-	std::cout << "Welcome to TextBuddy. " << _textFileName << " is ready for use" << std::endl;
+//executioning of commands
+void DataFile::executeCommandUntilExit() {
+	std::string input;
+	std::string command;
+	COMMAND_TYPE commandType;
+
+	do {
+		printCommandPrompt();
+		std::cin >> command;
+		std::getline(std::cin, input);
+
+		cleanInputString(input);
+
+		commandType = determineCommandType(command);
+		executeCommand(commandType, input);
+
+		writeContentsofDataFiletoTextFile();
+	} while(commandType != EXIT);
 }
 
-//determine the command type the user specify and function call the corrsponding action
-bool DataFile::determineCommandType() {
-	std::string commandTypeString ;
-	std::string descriptionString;
-
-	int deleteIdx;
-	std::cout << "command: ";
-	std::cin >> commandTypeString; 
-
-	if (commandTypeString == "add") {
-		std::getline( std::cin, descriptionString);
-
-		cleanDescriptionString(descriptionString);
+void DataFile::executeCommand(COMMAND_TYPE commandType , std::string descriptionString) {
+	switch(commandType) {
+	case ADD:
 		addLineToDataFile(descriptionString);
-		printAdd(descriptionString);
+		printAfterAddCommandMessage(descriptionString);
+		break;
+	case DELETE:
+		descriptionString = deleteAndReturnDeletedStringDescription(descriptionString);
+		printAfterDeleteCommandMessage(descriptionString);
+		break;
+	case CLEAR:
+		clearContentsFromDataFile();
+		printAfterClearCommandMessage();
+		break;
+	case DISPLAY:
+		displayContents();
+		break;
+	case EXIT:
+		break;
+	case INVALID:
+		printInvalidCommand();
+		break;
 	}
-	else {
-		if (commandTypeString == "delete") {
-			std::cin >> deleteIdx;
+}
 
-			descriptionString = deleteData(deleteIdx);
-			printDelete(descriptionString);
-		}
-		else {
-			if (commandTypeString == "clear") {
-				clear();
-				printClear();
-			}
-			else {
-				if (commandTypeString == "display") {
-					displayData();
-				}
-				else {
-					if (commandTypeString == "exit") {
-						return false;
-					}
-				}
-			}
-		}
+//the following are functions that help detemine what command user inputted
+DataFile::COMMAND_TYPE DataFile::determineCommandType(std::string command) {
+
+	if(isAdd(command)) {
+		return ADD;
+	} else if(isDelete(command)) {
+		return DELETE;
+	} else if(isClear(command)) {
+		return CLEAR;
+	} else if(isDisplay(command)) {
+		return DISPLAY;
+	} else if(isExit(command)) {
+		return EXIT;
+	} else {
+		return INVALID;
 	}
-	return true;
+}
+bool DataFile::isAdd(std::string command) {
+	if(command.compare("add")==0) {
+		return true;
+	} else {
+		return false;
+	}
+}
+bool DataFile::isDelete(std::string command) {
+	if(command.compare("delete")==0) {
+		return true;
+	} else {
+		return false;
+	}
+}
+bool DataFile::isClear(std::string command) {
+	if(command.compare("clear")==0) {
+		return true;
+	} else {
+		return false;
+	}
+}
+bool DataFile::isDisplay(std::string command) {
+	if(command.compare("display")==0) {
+		return true;
+	} else {
+		return false;
+	}
+}
+bool DataFile::isExit(std::string command) {
+	if(command.compare("exit")==0) {
+		return true;
+	} else {
+		return false;
+	}
 }
 
 //the following functions are command feedback
-void DataFile::printAdd(std::string descriptionString) {
-	std::cout << "added to "  << _textFileName << ": " << "\"" << descriptionString << "\"" << std::endl;
+void DataFile::printAfterAddCommandMessage(std::string descriptionString) {
+	sprintf_s(buffer, MESSAGE_ADD_LINE.c_str(), _textFileName.c_str(), descriptionString.c_str());
+	std::cout << buffer << std::endl;
 }
 
-void DataFile::printDelete(std::string descriptionString) {
-	std::cout << "deleted from " << _textFileName << ": " << "\"" << descriptionString << "\"" << std::endl;
+void DataFile::printAfterDeleteCommandMessage(std::string descriptionString) {
+	sprintf_s(buffer, MESSAGE_DELETE_LINE.c_str(), _textFileName.c_str(), descriptionString.c_str());
+	std::cout << buffer << std::endl;
 }
 
-void DataFile::printClear(){
-	std::cout << "all content deleted from "<< _textFileName << std::endl;
+void DataFile::printAfterClearCommandMessage(){
+	sprintf_s(buffer, MESSAGE_CLEAR_CONTENTS.c_str(), _textFileName.c_str());
+	std::cout << buffer << std::endl;
 }
 
+void DataFile::printInvalidCommand() {
+std::cout<< MESSAGE_INVALID_COMMAND <<std::endl;
+}
+
+void DataFile::printCommandPrompt() {
+	std::cout<< MESSAGE_COMMAND_PROMPT;
+}
 
 //the following functions are internal functions of the object
 void DataFile::addLineToDataFile(std::string descriptionString) {	
@@ -145,76 +207,61 @@ void DataFile::addLineToDataFile(std::string descriptionString) {
 }
 
 //print all content within data file with corresponding index
-void DataFile::displayData() {
-	std::vector<std::string>::iterator dataStructureIter = _dataFile.begin();
+void DataFile::displayContents() {
+	std::vector<std::string>::iterator dataFileIter = _dataFile.begin();
 	int indexCount = 1; 
 
-	if (!_dataFile.empty()) {
-		while(dataStructureIter != _dataFile.end()) {
-			std::cout << indexCount << ". " << *dataStructureIter << std::endl;
-			dataStructureIter++;
+	if(_dataFile.empty()) {
+		sprintf_s(buffer, MESSAGE_EMPTY_CONTENTS.c_str(), _textFileName.c_str());
+		std::cout << buffer << std::endl;
+	} else {
+		while (dataFileIter != _dataFile.end()) {
+			sprintf_s(buffer, MESSAGE_DISPLAY_CONTENTS.c_str(), indexCount, (*dataFileIter).c_str());
+			std::cout << buffer << std::endl;
+			dataFileIter++;
 			indexCount++;
 		}
 	}
-	if (_dataFile.empty()) {
-		std::cout << _textFileName << " is empty" << std::endl;
-	}
-
 }
 
-std::string DataFile::deleteData(int deleteIdx) {
-	std::string dataDescription;
-	std::vector<std::string>::iterator dataStructureIter = _dataFile.begin();
+std::string DataFile::deleteAndReturnDeletedStringDescription(std::string input) {
+	std::string descriptionString;
+	int deleteIdx;
+	std::vector<std::string>::iterator dataFileIter = _dataFile.begin();
+	std::istringstream iss(input);
 
-	dataStructureIter = dataStructureIter + deleteIdx - 1;
-	dataDescription = *dataStructureIter;
-	_dataFile.erase(dataStructureIter);
+	iss >> deleteIdx;
 
-	return dataDescription;
+	dataFileIter = dataFileIter + deleteIdx - 1;
+	descriptionString = *dataFileIter;
+	_dataFile.erase(dataFileIter);
+
+	return descriptionString;
 }
 
 //delete all description 
-void DataFile::clear() {
+void DataFile::clearContentsFromDataFile() {
 	_dataFile.clear();
 }
 
 //write the data stored in the class to the text file given by the user at the start of the program
-void DataFile::save() {
+void DataFile::writeContentsofDataFiletoTextFile() {
 	std::ofstream writeFile;
 	writeFile.close(); //close and reopen file to refresh the data file for overwriting
 	writeFile.open(_textFileName);
 
-	std::vector<std::string>::iterator dataStructureIter = _dataFile.begin();
-	while (dataStructureIter != _dataFile.end()) {
-		writeFile << *dataStructureIter ; //write description in data structure to text file
+	std::vector<std::string>::iterator dataFileIter = _dataFile.begin();
+	while (dataFileIter != _dataFile.end()) {
+		writeFile << *dataFileIter ; //write description in data structure to text file
 		writeFile << std::endl;
-		dataStructureIter++;
+		dataFileIter++;
 	}
-
 }
 
 //constructor + destructor
 DataFile::DataFile() {
 }
 
-/*
-DataFile::DataFile(std::string textFile) {
-	std::ofstream writeFile;
-	std::ifstream readFile(textFile);
-	std::string descriptionString;
-
-	_textFileName = textFile;
-
-	if (readFile.is_open()) {							//check if there is an existing text file created 
-		while (getline(readFile, descriptionString)) {	//write file to internal data structure
-			addDescription(descriptionString);
-		}
-	}
-	else {
-		writeFile.open(_textFileName); //create text file for storage of data file
-	}
-}
-*/
 DataFile::~DataFile(void) {
 }
 

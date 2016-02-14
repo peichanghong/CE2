@@ -7,6 +7,15 @@
 
 class DataFile {
 private:
+	//internal variables and data structure
+	std::vector<std::string> _dataFile;
+	std::string _textFileName; 
+	char buffer[255];
+
+	enum COMMAND_TYPE {
+		ADD, DELETE, CLEAR, DISPLAY, EXIT, INVALID 
+	};
+
 	//set environment stage
 	bool checkForArguments(int argc, char* argv[]);
 	bool checkForExistingTextFile();
@@ -14,31 +23,39 @@ private:
 	void writeTextFiletoDataFile();
 	void openNewTextFile();
 
-
-	//internal variables and data structure
-	std::vector<std::string> _dataFile;
-	std::string _textFileName; 
-	char buffer[255];
+	//determine command type functions
+	COMMAND_TYPE determineCommandType(std::string command);
+	bool isAdd(std::string command);
+	bool isDelete(std::string command);
+	bool isClear(std::string command);
+	bool isDisplay(std::string command);
+	bool isExit(std::string command);
 
 	//object's internal function for commands
+	void executeCommand(COMMAND_TYPE commandType , std::string descriptionString);
+
 	void addLineToDataFile(std::string descriptionString);
-	void displayData();
-	std::string deleteData(int deleteIdx); //delete description pertaining to the index and push the back queue to replace the deleted description
-	void clear(); //delete all description
+	void displayContents();
+	std::string deleteAndReturnDeletedStringDescription(std::string input); //delete description pertaining to the index and push the back queue to replace the deleted description
+	void clearContentsFromDataFile(); //delete all description
 
 	//command feedback
-	void printAdd(std::string descriptionString);
-	void printDelete(std::string descriptionString);
-	void printClear();
+	void printAfterAddCommandMessage(std::string descriptionString);
+	void printAfterDeleteCommandMessage(std::string descriptionString);
+	void printAfterClearCommandMessage();
+	void printInvalidCommand();
+	void printCommandPrompt();
+
+	//helper function
+	void cleanInputString(std::string &descriptionString);
+	void writeContentsofDataFiletoTextFile(); //save data from textbuddy to a file text 
 
 public:
-	void welcomePage();
-	bool determineCommandType(); //always return true for conducting repetition unless user input "exit" 
-	void save(); //save data from textbuddy to a file text 
+	
 	DataFile();
-	//DataFile(std::string textFile); //create or read a text file
 	~DataFile(void);
 	void setEnvironment(int argc, char* argv[]);
 	void displayWelcomePage();
+	void executeCommandUntilExit();
 };
 
