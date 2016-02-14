@@ -4,6 +4,8 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <algorithm>
+
 
 class DataFile {
 private:
@@ -13,7 +15,7 @@ private:
 	char buffer[255];
 
 	enum COMMAND_TYPE {
-		ADD, DELETE, CLEAR, DISPLAY, EXIT, INVALID 
+		ADD, DELETE, CLEAR, DISPLAY, SORT, EXIT, INVALID 
 	};
 
 	//set environment stage
@@ -28,6 +30,7 @@ private:
 	bool isAdd(std::string command);
 	bool isDelete(std::string command);
 	bool isClear(std::string command);
+	bool isSort(std::string command);
 	bool isDisplay(std::string command);
 	bool isExit(std::string command);
 
@@ -38,11 +41,13 @@ private:
 	void displayContents();
 	std::string deleteAndReturnDeletedStringDescription(std::string input); //delete description pertaining to the index and push the back queue to replace the deleted description
 	void clearContentsFromDataFile(); //delete all description
+	void sortDataFileAlphabetically();
 
 	//command feedback
 	void printAfterAddCommandMessage(std::string descriptionString);
 	void printAfterDeleteCommandMessage(std::string descriptionString);
 	void printAfterClearCommandMessage();
+	void printAfterSortingAlphabetically();
 	void printInvalidCommand();
 	void printCommandPrompt();
 
