@@ -29,7 +29,7 @@
 std::string checkForDataFile(int argc, char* argv[]); 
 
 int main (int argc, char* argv[]) {
-	DataFile* TextBuddy ;
+	/*DataFile* TextBuddy ;
 	TextBuddy = new DataFile(checkForDataFile(argc, argv));
 
 	TextBuddy->welcomePage();
@@ -37,6 +37,10 @@ int main (int argc, char* argv[]) {
 	while (TextBuddy->determineCommandType()!= false) {	//programme request user for input until user specify command "exit"
 		TextBuddy->save();								//save file whenever a command is given
 	}
+	*/
+	DataFile TextBuddy ;
+	TextBuddy.setEnvironment(argc,argv);
+	TextBuddy.displayWelcomePage();
 	return 0;
 }
 

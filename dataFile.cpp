@@ -1,4 +1,76 @@
 #include "DataFile.h"
+
+const std::string MESSAGE_WELCOME = "Welcome to TextBuddy. %s is ready for use";
+const std::string MESSAGE_ADD_LINE = "added to %s: \"%s\"";
+const std::string MESSAGE_DELETE_LINE = "deleted from %s: \"%s\"";
+const std::string MESSAGE_CLEAR_CONTENTS = "all content deleted from %s";
+const std::string MESSAGE_EMPTY_CONTENTS = "%s is empty";
+const std::string MESSAGE_DISPLAY_CONTENTS = "%d. %s";
+const std::string MESSAGE_COMMAND_PROMPT = "command: ";
+const std::string MESSAGE_TEXT_NAME_PROMPT = "Please input the text file: ";
+
+void DataFile::setEnvironment(int argc, char* argv[]) {
+	if(checkForArguments(argc, argv) == false) { //MISSING ONE .TXT CHECKER
+		_textFileName = promptForTextName();
+	} else {
+		_textFileName = argv[1];
+	}
+
+	if(checkForExistingTextFile() == true) {
+		writeTextFiletoDataFile();
+	} else {
+		openNewTextFile();
+	}
+}
+
+bool DataFile::checkForArguments(int argc, char* argv[]) {
+	if (argc < 2) {
+		return false;
+	} else {
+		return true;
+	}
+}
+
+std::string DataFile::promptForTextName() {
+	std::string textName;
+	std::cout << MESSAGE_TEXT_NAME_PROMPT;
+	std::cin >> textName;
+
+	return textName;
+}
+
+bool DataFile::checkForExistingTextFile() {
+	std::ifstream readFile(_textFileName);
+
+	if (readFile.is_open()) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+void DataFile::writeTextFiletoDataFile() {
+	std::string descriptionString;
+	std::ifstream readFile(_textFileName);
+
+	while (getline(readFile, descriptionString)) {	
+		addLineToDataFile(descriptionString);
+	}
+}
+
+void DataFile::openNewTextFile() {
+	std::ofstream writeFile;
+
+	writeFile.open(_textFileName);
+}
+
+void DataFile::displayWelcomePage() {
+	sprintf_s(buffer, MESSAGE_WELCOME.c_str(), _textFileName.c_str());
+	std::cout << buffer << std::endl;
+}
+
+/************************************************************************/
+
 //remove extra spaces before the inital word in the string
 void cleanDescriptionString(std::string &descriptionString) {
 	while (descriptionString[0] == ' ') {
@@ -23,7 +95,7 @@ bool DataFile::determineCommandType() {
 		std::getline( std::cin, descriptionString);
 
 		cleanDescriptionString(descriptionString);
-		addDescription(descriptionString);
+		addLineToDataFile(descriptionString);
 		printAdd(descriptionString);
 	}
 	else {
@@ -68,7 +140,7 @@ void DataFile::printClear(){
 
 
 //the following functions are internal functions of the object
-void DataFile::addDescription(std::string descriptionString) {	
+void DataFile::addLineToDataFile(std::string descriptionString) {	
 	_dataFile.push_back(descriptionString);
 }
 
@@ -122,6 +194,10 @@ void DataFile::save() {
 }
 
 //constructor + destructor
+DataFile::DataFile() {
+}
+
+/*
 DataFile::DataFile(std::string textFile) {
 	std::ofstream writeFile;
 	std::ifstream readFile(textFile);
@@ -138,7 +214,7 @@ DataFile::DataFile(std::string textFile) {
 		writeFile.open(_textFileName); //create text file for storage of data file
 	}
 }
-
+*/
 DataFile::~DataFile(void) {
 }
 
