@@ -4,11 +4,11 @@
 #include <string>
 #include <vector>
 
-class dataFile {
+class DataFile {
 private:
 	//internal variables and data structure
-	std::vector<std::string> _dataStructure;
-	std::string _dataFile; 
+	std::vector<std::string> _dataFile;
+	std::string _textFileName; 
 
 	//object's internal function for commands
 	void addDescription(std::string descriptionString);
@@ -25,7 +25,7 @@ public:
 	void welcomePage();
 	bool determineCommandType(); //always return true for conducting repetition unless user input "exit" 
 	void save(); //save data from textbuddy to a file text 
-	dataFile(std::string textFile); //create or read a text file
-	~dataFile(void);
+	DataFile(std::string textFile); //create or read a text file
+	~DataFile(void);
 };
 

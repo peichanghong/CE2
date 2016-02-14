@@ -24,13 +24,13 @@
 //	File is saved after every command to prevent accidental or early termination
 //@author: Pei Chang Hong
 
-#include "dataFile.h"
+#include "DataFile.h"
 
 std::string checkForDataFile(int argc, char* argv[]); 
 
 int main (int argc, char* argv[]) {
-	dataFile* TextBuddy ;
-	TextBuddy = new dataFile(checkForDataFile(argc, argv));
+	DataFile* TextBuddy ;
+	TextBuddy = new DataFile(checkForDataFile(argc, argv));
 
 	TextBuddy->welcomePage();
 
