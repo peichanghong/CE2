@@ -159,7 +159,7 @@ DataFile::COMMAND_TYPE DataFile::determineCommandType(std::string command) {
 }
 
 bool DataFile::isAdd(std::string command) {
-	if(command.compare("add")==0) {
+	if(command.compare("add") == 0) {
 		return true;
 	} else {
 		return false;
@@ -167,7 +167,7 @@ bool DataFile::isAdd(std::string command) {
 }
 
 bool DataFile::isDelete(std::string command) {
-	if(command.compare("delete")==0) {
+	if(command.compare("delete") == 0) {
 		return true;
 	} else {
 		return false;
@@ -175,7 +175,7 @@ bool DataFile::isDelete(std::string command) {
 }
 
 bool DataFile::isClear(std::string command) {
-	if(command.compare("clear")==0) {
+	if(command.compare("clear") == 0) {
 		return true;
 	} else {
 		return false;
@@ -183,7 +183,7 @@ bool DataFile::isClear(std::string command) {
 }
 
 bool DataFile::isDisplay(std::string command) {
-	if(command.compare("display")==0) {
+	if(command.compare("display") == 0) {
 		return true;
 	} else {
 		return false;
@@ -191,7 +191,7 @@ bool DataFile::isDisplay(std::string command) {
 }
 
 bool DataFile::isSort(std::string command) {
-	if(command.compare("sort")==0) {
+	if(command.compare("sort") == 0) {
 		return true;
 	} else {
 		return false;
@@ -199,7 +199,7 @@ bool DataFile::isSort(std::string command) {
 }
 
 bool DataFile::isSearch(std::string command) {
-	if(command.compare("search")==0) {
+	if(command.compare("search") == 0) {
 		return true;
 	} else {
 		return false;
@@ -207,7 +207,7 @@ bool DataFile::isSearch(std::string command) {
 }
 
 bool DataFile::isExit(std::string command) {
-	if(command.compare("exit")==0) {
+	if(command.compare("exit") == 0) {
 		return true;
 	} else {
 		return false;
@@ -293,6 +293,8 @@ std::string DataFile::deleteAndReturnDeletedStringDescription(std::string input)
 	std::istringstream iss(input);
 
 	iss >> deleteIdx;
+
+	
 	displayListIter = displayListIter + (deleteIdx-1);
 
 	//retrieve index of task in data file
