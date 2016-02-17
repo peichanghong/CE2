@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "CppUnitTest.h"
 #include "DataFile.cpp"
+#include "MemoryPackage.cpp"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -19,7 +20,7 @@ namespace DataFileTest
 
 			DataFileTest.addLineToDataFile("Insert 1 line");
 
-			actualString = DataFileTest._dataFile[0];
+			actualString = ((DataFileTest.getdataFile())[0]).getString();
 			Assert::AreEqual(expectedString, actualString );
 			}
 		}
@@ -40,7 +41,7 @@ namespace DataFileTest
 			DataFileTest.sortDataFileAlphabetically();
 
 			while(i!=4) {
-				actualString = DataFileTest._dataFile[i];
+				actualString = ((DataFileTest.getdataFile())[i]).getString();
 				Assert::AreEqual(expectedString[i], actualString );
 				i++;
 			}

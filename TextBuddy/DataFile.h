@@ -5,18 +5,19 @@
 #include <string>
 #include <vector>
 #include <algorithm>
-
+#include "MemoryPackage.h"
 
 class DataFile {
 #ifndef TESTMODE 
-private:
+private: 
 	//internal variables and data structure
-	std::vector<std::string> _dataFile;
+	std::vector<MemoryPackage> _dataFile;
+	std::vector<MemoryPackage*> _displayList;
 	std::string _textFileName; 
 	char buffer[255];
 
 	enum COMMAND_TYPE {
-		ADD, DELETE, CLEAR, DISPLAY, SORT, EXIT, INVALID 
+		ADD, DELETE, CLEAR, DISPLAY, SORT, SEARCH, EXIT, INVALID 
 	};
 
 	//set environment stage
@@ -31,8 +32,9 @@ private:
 	bool isAdd(std::string command);
 	bool isDelete(std::string command);
 	bool isClear(std::string command);
-	bool isSort(std::string command);
 	bool isDisplay(std::string command);
+	bool isSort(std::string command);
+	bool isSearch(std::string command);
 	bool isExit(std::string command);
 
 	//object's internal function for commands
@@ -43,28 +45,39 @@ private:
 	std::string deleteAndReturnDeletedStringDescription(std::string input); //delete description pertaining to the index and push the back queue to replace the deleted description
 	void clearContentsFromDataFile(); //delete all description
 	void sortDataFileAlphabetically();
+	void searchForKeywords(std::string keyword);
 
 	//command feedback
 	void printAfterAddCommandMessage(std::string descriptionString);
 	void printAfterDeleteCommandMessage(std::string descriptionString);
 	void printAfterClearCommandMessage();
 	void printAfterSortingAlphabetically();
+	void printDisplayList();
+	void printSearchList(std::string keyword);
 	void printInvalidCommand();
 	void printCommandPrompt();
 
+
 	//helper function
+	void createDisplayList();
+	void createTemporarySearchList(std::string keyword);
 	void cleanInputString(std::string &descriptionString);
 	void writeContentsofDataFiletoTextFile(); //save data from textbuddy to a file text 
+	void updateNumberingToDataFile();
 
+	//test unit getter function
+	std::vector<MemoryPackage> getdataFile() ;
 #else 
-public:
+public: 
+
 	//internal variables and data structure
-	std::vector<std::string> _dataFile;
+	std::vector<MemoryPackage> _dataFile;
+	std::vector<MemoryPackage*> _displayList;
 	std::string _textFileName; 
 	char buffer[255];
 
 	enum COMMAND_TYPE {
-		ADD, DELETE, CLEAR, DISPLAY, SORT, EXIT, INVALID 
+		ADD, DELETE, CLEAR, DISPLAY, SORT, SEARCH, EXIT, INVALID 
 	};
 
 	//set environment stage
@@ -79,8 +92,9 @@ public:
 	bool isAdd(std::string command);
 	bool isDelete(std::string command);
 	bool isClear(std::string command);
-	bool isSort(std::string command);
 	bool isDisplay(std::string command);
+	bool isSort(std::string command);
+	bool isSearch(std::string command);
 	bool isExit(std::string command);
 
 	//object's internal function for commands
@@ -91,18 +105,28 @@ public:
 	std::string deleteAndReturnDeletedStringDescription(std::string input); //delete description pertaining to the index and push the back queue to replace the deleted description
 	void clearContentsFromDataFile(); //delete all description
 	void sortDataFileAlphabetically();
+	void searchForKeywords(std::string keyword);
 
 	//command feedback
 	void printAfterAddCommandMessage(std::string descriptionString);
 	void printAfterDeleteCommandMessage(std::string descriptionString);
 	void printAfterClearCommandMessage();
 	void printAfterSortingAlphabetically();
+	void printDisplayList();
+	void printSearchList(std::string keyword);
 	void printInvalidCommand();
 	void printCommandPrompt();
 
+
 	//helper function
+	void createDisplayList();
+	void createTemporarySearchList(std::string keyword);
 	void cleanInputString(std::string &descriptionString);
 	void writeContentsofDataFiletoTextFile(); //save data from textbuddy to a file text 
+	void updateNumberingToDataFile();
+
+	//test unit getter function
+	std::vector<MemoryPackage> getdataFile();
 #endif
 
 public:
@@ -112,5 +136,6 @@ public:
 	void setEnvironment(int argc, char* argv[]);
 	void displayWelcomePage();
 	void executeCommandUntilExit();
+	
 };
 

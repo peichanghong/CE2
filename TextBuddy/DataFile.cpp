@@ -10,6 +10,7 @@ const std::string MESSAGE_SORTED_CONTENTS = "all content sorted alphabetically i
 const std::string MESSAGE_COMMAND_PROMPT = "command: ";
 const std::string MESSAGE_TEXT_NAME_PROMPT = "Please input the text file: ";
 const std::string MESSAGE_INVALID_COMMAND = "Invalid command inputted";
+const std::string MESSAGE_SEARCH_ERROR = "Unable to find (%s) in %s";
 
 //constructor + destructor
 DataFile::DataFile() {
@@ -28,6 +29,7 @@ void DataFile::setEnvironment(int argc, char* argv[]) {
 
 	if(checkForExistingTextFile() == true) {
 		writeTextFiletoDataFile();
+		updateNumberingToDataFile();
 	} else {
 		openNewTextFile();
 	}
@@ -79,13 +81,6 @@ void DataFile::displayWelcomePage() {
 	std::cout << buffer << std::endl;
 }
 
-//remove extra spaces before the inital word in the string
-void DataFile::cleanInputString(std::string &descriptionString) {
-	while (descriptionString[0] == ' ') {
-		descriptionString.erase(descriptionString.begin()); 
-	}
-}
-
 //executioning of commands
 void DataFile::executeCommandUntilExit() {
 	std::string input;
@@ -110,10 +105,12 @@ void DataFile::executeCommand(COMMAND_TYPE commandType , std::string description
 	switch(commandType) {
 	case ADD:
 		addLineToDataFile(descriptionString);
+		updateNumberingToDataFile();
 		printAfterAddCommandMessage(descriptionString);
 		break;
 	case DELETE:
 		descriptionString = deleteAndReturnDeletedStringDescription(descriptionString);
+		updateNumberingToDataFile();
 		printAfterDeleteCommandMessage(descriptionString);
 		break;
 	case CLEAR:
@@ -125,7 +122,11 @@ void DataFile::executeCommand(COMMAND_TYPE commandType , std::string description
 		break;
 	case SORT:
 		sortDataFileAlphabetically();
+		updateNumberingToDataFile();
 		printAfterSortingAlphabetically();
+		break;
+	case SEARCH:
+		searchForKeywords(descriptionString);
 		break;
 	case EXIT:
 		break;
@@ -148,6 +149,8 @@ DataFile::COMMAND_TYPE DataFile::determineCommandType(std::string command) {
 		return DISPLAY;
 	} else if(isSort(command)) {
 		return SORT;
+	} else if(isSearch(command)) {
+		return SEARCH;
 	} else if(isExit(command)) {
 		return EXIT;
 	} else {
@@ -195,6 +198,14 @@ bool DataFile::isSort(std::string command) {
 	}
 }
 
+bool DataFile::isSearch(std::string command) {
+	if(command.compare("search")==0) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
 bool DataFile::isExit(std::string command) {
 	if(command.compare("exit")==0) {
 		return true;
@@ -233,38 +244,63 @@ void DataFile::printCommandPrompt() {
 }
 
 //the following functions are internal functions of the object
-void DataFile::addLineToDataFile(std::string descriptionString) {	
-	_dataFile.push_back(descriptionString);
+void DataFile::addLineToDataFile(std::string descriptionString) {
+	MemoryPackage memoryPackage(descriptionString);
+	_dataFile.push_back(memoryPackage);
 }
 
 //print all content within data file with corresponding index
 void DataFile::displayContents() {
-	std::vector<std::string>::iterator dataFileIter = _dataFile.begin();
+	createDisplayList();
+	printDisplayList();
+}
+
+void DataFile::createDisplayList() {
+	std::vector<MemoryPackage>::iterator dataFileIter = _dataFile.begin();
+
+	_displayList.clear();
+
+	while(dataFileIter != _dataFile.end()) {
+		_displayList.push_back(&(*dataFileIter));
+		dataFileIter++;
+	}
+}
+
+void DataFile::printDisplayList() {
+	std::vector<MemoryPackage*>::iterator displayListIter = _displayList.begin();
 	int indexCount = 1; 
 
-	if(_dataFile.empty()) { 
+	if(_displayList.empty()) { 
 		sprintf_s(buffer, MESSAGE_EMPTY_CONTENTS.c_str(), _textFileName.c_str());
 		std::cout << buffer << std::endl;
 	} else {
-		while (dataFileIter != _dataFile.end()) {
-			sprintf_s(buffer, MESSAGE_DISPLAY_CONTENTS.c_str(), indexCount, (*dataFileIter).c_str());
+		while (displayListIter != _displayList.end()) {
+			sprintf_s(buffer, MESSAGE_DISPLAY_CONTENTS.c_str(), /*indexCount*/(*(*displayListIter)).getIndex(), ((**displayListIter).getString()).c_str());
 			std::cout << buffer << std::endl;
-			dataFileIter++;
+			displayListIter++;
 			indexCount++;
 		}
 	}
 }
 
+//enable deletion from display list and temporary searched list.
+//this is to ensure deletion of the correct task
 std::string DataFile::deleteAndReturnDeletedStringDescription(std::string input) {
 	std::string descriptionString;
 	int deleteIdx;
-	std::vector<std::string>::iterator dataFileIter = _dataFile.begin();
+	std::vector<MemoryPackage*>::iterator displayListIter = _displayList.begin();
+	std::vector<MemoryPackage>::iterator dataFileIter = _dataFile.begin();
 	std::istringstream iss(input);
 
 	iss >> deleteIdx;
+	displayListIter = displayListIter + (deleteIdx-1);
 
-	dataFileIter = dataFileIter + deleteIdx - 1;
-	descriptionString = *dataFileIter;
+	//retrieve index of task in data file
+	deleteIdx = (**displayListIter).getIndex();
+	dataFileIter = dataFileIter + (deleteIdx-1);
+
+	descriptionString = (*dataFileIter).getString();
+
 	_dataFile.erase(dataFileIter);
 
 	return descriptionString;
@@ -276,7 +312,46 @@ void DataFile::clearContentsFromDataFile() {
 }
 
 void DataFile::sortDataFileAlphabetically() {
-	std::sort(_dataFile.begin(), _dataFile.end());
+	MessagePackageSorter comparator;
+	std::sort(_dataFile.begin(), _dataFile.end(), comparator );
+}
+
+//input keyword and program will return all result that contain the keyword
+void DataFile::searchForKeywords(std::string keyword){
+	createTemporarySearchList(keyword);
+	printSearchList(keyword);
+}
+
+void DataFile::createTemporarySearchList(std::string keyword) {
+	std::string extractedString;
+	std::vector<MemoryPackage>::iterator dataFileIter = _dataFile.begin();
+
+	_displayList.clear();
+
+	while(dataFileIter != _dataFile.end()) {
+		if(((*dataFileIter).getString()).find(keyword) != std::string::npos) {
+			_displayList.push_back(&(*dataFileIter));
+		} 
+
+		dataFileIter++;
+	}
+}
+
+void DataFile::printSearchList(std::string keyword) {
+	std::vector<MemoryPackage*>::iterator displayListIter = _displayList.begin();
+	int indexCount = 1; 
+
+	if(_displayList.empty()) { 
+		sprintf_s(buffer, MESSAGE_SEARCH_ERROR.c_str(), keyword.c_str(), _textFileName.c_str());
+		std::cout << buffer << std::endl;
+	} else {
+		while (displayListIter != _displayList.end()) {
+			sprintf_s(buffer, MESSAGE_DISPLAY_CONTENTS.c_str(), indexCount, ((**displayListIter).getString()).c_str());
+			std::cout << buffer << std::endl;
+			displayListIter++;
+			indexCount++;
+		}
+	}
 }
 
 //write the data stored in the class to the text file given by the user at the start of the program
@@ -285,12 +360,33 @@ void DataFile::writeContentsofDataFiletoTextFile() {
 	writeFile.close(); //close and reopen file to refresh the data file for overwriting
 	writeFile.open(_textFileName);
 
-	std::vector<std::string>::iterator dataFileIter = _dataFile.begin();
+	std::vector<MemoryPackage>::iterator dataFileIter = _dataFile.begin();
 	while (dataFileIter != _dataFile.end()) {
-		writeFile << *dataFileIter ; //write description in data structure to text file
+		writeFile << (*dataFileIter).getString(); //write description in data structure to text file
 		writeFile << std::endl;
 		dataFileIter++;
 	}
 }
 
+//remove extra spaces before the inital word in the string
+void DataFile::cleanInputString(std::string &descriptionString) {
+	while (descriptionString[0] == ' ') {
+		descriptionString.erase(descriptionString.begin()); 
+	}
+}
 
+void DataFile::updateNumberingToDataFile() {
+	int idx = 1;
+	std::vector<MemoryPackage>::iterator dataFileIter = _dataFile.begin();
+
+	while(dataFileIter != _dataFile.end()) {
+		(*dataFileIter).updateIdx(idx);
+		dataFileIter++;
+		idx = idx + 1;
+	}
+}
+
+//test unit getter function
+std::vector<MemoryPackage> DataFile::getdataFile() { 
+	return _dataFile;
+}

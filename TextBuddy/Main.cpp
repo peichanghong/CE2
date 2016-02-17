@@ -29,33 +29,14 @@
 std::string checkForDataFile(int argc, char* argv[]); 
 
 int main (int argc, char* argv[]) {
-	/*DataFile* TextBuddy ;
-	TextBuddy = new DataFile(checkForDataFile(argc, argv));
-
-	TextBuddy->welcomePage();
-
-	while (TextBuddy->determineCommandType()!= false) {	//programme request user for input until user specify command "exit"
-		TextBuddy->save();								//save file whenever a command is given
-	}
-	*/
 	DataFile TextBuddy ;
+
 	TextBuddy.setEnvironment(argc,argv);
 	TextBuddy.displayWelcomePage();
+
 	TextBuddy.executeCommandUntilExit();
+
 	return 0;
 }
 
-//for cases without secondary data text file
-//return the name of the secondary text file
-std::string checkForDataFile(int argc, char* argv[]) {
-	std::string textName;
-	if (argc < 2){
-		std::cout << "Please input the text file: ";
-		std::cin >>textName;
-	}
-	else {
-		textName = argv[1];
-	}
 
-	return textName;
-}
