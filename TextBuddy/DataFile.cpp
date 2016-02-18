@@ -21,7 +21,7 @@ DataFile::~DataFile() {
 
 //setting the environment before properly executing main fucntion of TextBuddy
 void DataFile::setEnvironment(int argc, char* argv[]) {
-	if(checkForArguments(argc, argv) == false) { //MISSING ONE .TXT CHECKER
+	if(checkForArguments(argc, argv) == false) { 
 		_textFileName = promptForTextName();
 	} else {
 		_textFileName = argv[1];
