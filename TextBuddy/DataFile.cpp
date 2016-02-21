@@ -351,7 +351,7 @@ void DataFile::printSearchList(std::string keyword) {
 			sprintf_s(buffer, MESSAGE_DISPLAY_CONTENTS.c_str(), indexCount, ((**displayListIter).getString()).c_str());
 			std::cout << buffer << std::endl;
 			displayListIter++;
-			indexCount++;
+			indexCount++; 
 		}
 	}
 }
