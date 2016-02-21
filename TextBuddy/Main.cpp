@@ -1,5 +1,5 @@
 //
-//	TextBuddy [CS2103 CE1]
+//	TextBuddy [CS2103 CE2]
 //
 //	TextBuddy is a CLI C++ program that can be used to manipulate text within a file
 //	
@@ -15,6 +15,8 @@
 //	[delete <number>]--	delete text at the corresponding line given by the user
 //	[display]----------	display the file contents
 //	[clear]------------	delete all file content in the text file
+//	[sort] ------------ sort text in alphabetical order
+//	[search <text>] --- search and display result from the searched word
 //	[exit] ------------	exit the TextBuddy program
 //
 //	Assumptions:
@@ -22,21 +24,19 @@
 //	User will input a valid text file for saving the data file
 //
 //	File is saved after every command to prevent accidental or early termination
-//@author: Pei Chang Hong
+//	@author: Pei Chang Hong
 
 #include "DataFile.h"
 
-std::string checkForDataFile(int argc, char* argv[]); 
-
 int main (int argc, char* argv[]) {
-	DataFile TextBuddy ;
+    DataFile TextBuddy ;
 
-	TextBuddy.setEnvironment(argc,argv);
-	TextBuddy.displayWelcomePage();
+    TextBuddy.setEnvironment(argc,argv);
+    TextBuddy.displayWelcomePage();
 
-	TextBuddy.executeCommandUntilExit();
+    TextBuddy.executeCommandUntilExit();
 
-	return 0;
+    return 0;
 }
 
 
