@@ -68,11 +68,7 @@ public:
 	void writeContentsofDataFiletoTextFile(); //save data from textbuddy to a file text 
 	void updateNumberingToDataFile();
 
-	//test unit getter function
-	std::vector<MemoryPackage> getdataFile() ;
-
 public:
-
 	DataFile();
 	~DataFile(void);
 	void setEnvironment(int argc, char* argv[]);

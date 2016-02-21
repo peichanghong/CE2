@@ -387,8 +387,3 @@ void DataFile::updateNumberingToDataFile() {
 		idx = idx + 1;
 	}
 }
-
-//test unit getter function
-std::vector<MemoryPackage> DataFile::getdataFile() { 
-	return _dataFile;
-}

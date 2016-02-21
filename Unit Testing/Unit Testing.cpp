@@ -19,7 +19,7 @@ public:
 
 			DataFileTest.addLineToDataFile("Insert 1 line");
 
-			actualString = ((DataFileTest.getdataFile())[0]).getString();
+			actualString = (DataFileTest._dataFile[0]).getString();
 			Assert::AreEqual(expectedString, actualString );
 		}
 	}
@@ -39,7 +39,7 @@ public:
 		DataFileTest.sortDataFileAlphabetically();
 
 		while(i!=4) {
-			actualString = ((DataFileTest.getdataFile())[i]).getString();
+			actualString = (DataFileTest._dataFile[i]).getString();
 			Assert::AreEqual(expectedString[i], actualString );
 			i++;
 		}
@@ -66,7 +66,7 @@ public:
 
 		Assert::AreEqual(expectedReturnString, returnString );
 		while(i!=3) {
-			actualString = ((DataFileTest.getdataFile())[i]).getString();
+			actualString = (DataFileTest._dataFile[i]).getString();
 			Assert::AreEqual(expectedString[i], actualString );
 			i++;
 		}
@@ -93,7 +93,7 @@ public:
 
 		Assert::AreEqual(expectedReturnString, returnString );
 		while(i!=3) {
-			actualString = ((DataFileTest.getdataFile())[i]).getString();
+			actualString = (DataFileTest._dataFile[i]).getString();
 			Assert::AreEqual(expectedString[i], actualString );
 			i++;
 		}
