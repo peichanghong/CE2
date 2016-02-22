@@ -275,7 +275,7 @@ void DataFile::printDisplayList() {
 		std::cout << buffer << std::endl;
 	} else {
 		while (displayListIter != _displayList.end()) {
-			sprintf_s(buffer, MESSAGE_DISPLAY_CONTENTS.c_str(), /*indexCount*/(*(*displayListIter)).getIndex(), ((**displayListIter).getString()).c_str());
+			sprintf_s(buffer, MESSAGE_DISPLAY_CONTENTS.c_str(), (*(*displayListIter)).getIndex(), ((**displayListIter).getString()).c_str());
 			std::cout << buffer << std::endl;
 			displayListIter++;
 			indexCount++;
@@ -359,12 +359,12 @@ void DataFile::printSearchList(std::string keyword) {
 //write the data stored in the class to the text file given by the user at the start of the program
 void DataFile::writeContentsofDataFiletoTextFile() {
 	std::ofstream writeFile;
-	writeFile.close(); //close and reopen file to refresh the data file for overwriting
+	writeFile.close(); 
 	writeFile.open(_textFileName);
 
 	std::vector<MemoryPackage>::iterator dataFileIter = _dataFile.begin();
 	while (dataFileIter != _dataFile.end()) {
-		writeFile << (*dataFileIter).getString(); //write description in data structure to text file
+		writeFile << (*dataFileIter).getString(); 
 		writeFile << std::endl;
 		dataFileIter++;
 	}
@@ -386,9 +386,4 @@ void DataFile::updateNumberingToDataFile() {
 		dataFileIter++;
 		idx = idx + 1;
 	}
-}
-
-//test unit getter function
-std::vector<MemoryPackage> DataFile::getdataFile() { 
-	return _dataFile;
 }

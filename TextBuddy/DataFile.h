@@ -45,8 +45,8 @@ public:
 
 	void addLineToDataFile(std::string descriptionString);
 	void displayContents();
-	std::string deleteAndReturnDeletedStringDescription(std::string input); //delete description pertaining to the index and push the back queue to replace the deleted description
-	void clearContentsFromDataFile(); //delete all description
+	std::string deleteAndReturnDeletedStringDescription(std::string input); 
+	void clearContentsFromDataFile(); 
 	void sortDataFileAlphabetically();
 	void searchForKeywords(std::string keyword);
 
@@ -65,11 +65,8 @@ public:
 	void createDisplayList();
 	void createTemporarySearchList(std::string keyword);
 	void cleanInputString(std::string &descriptionString);
-	void writeContentsofDataFiletoTextFile(); //save data from textbuddy to a file text 
+	void writeContentsofDataFiletoTextFile(); 
 	void updateNumberingToDataFile();
-
-	//test unit getter function
-	std::vector<MemoryPackage> getdataFile() ;
 
 public:
 
